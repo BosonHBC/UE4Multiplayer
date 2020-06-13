@@ -42,7 +42,7 @@ public:
 protected:
 	TSubclassOf<UUserWidget> m_mainMenuClass;
 	UMainMenu* m_mainMenuRef;
-	FName m_sessionName = "New Game";
+	FName m_sessionName = "Boson Game";
 
 	IOnlineSessionPtr m_sessionInterface;
 	TSharedPtr<FOnlineSessionSearch> m_searchSettings;

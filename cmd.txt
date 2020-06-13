@@ -16,7 +16,7 @@ Build client:
 "D:\UnrealProject\MultiplayerPuzzle\Build\WindowsNoEditor\MultiplayerPuzzle.exe" 25.11.247.239 -game -log
 
 Start lobby
-"D:\EpicGames\UE_4.24\Engine\Binaries\Win64\UE4Editor.exe" "D:\UnrealProject\MultiplayerPuzzle\MultiplayerPuzzle.uproject" /Game/Maps/MainMenu -game -log
+"D:\EpicGames\UE_4.24\Engine\Binaries\Win64\UE4Editor.exe" "D:\Github\UE4Multiplayer\MultiplayerPuzzle.uproject" /Game/Maps/MainMenu -game -log
 
 MyIPv4:
 192.168.1.115

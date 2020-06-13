@@ -36,10 +36,7 @@ void UCustomGameInstance::Init()
 			m_sessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UCustomGameInstance::OnSessionDestroyed);
 			m_sessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UCustomGameInstance::OnFindSessionComplete);
 			m_sessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UCustomGameInstance::OnJoinSessionComplete);
-			// make shareable will make new operator work in unreal
-			m_searchSettings = MakeShareable(new FOnlineSessionSearch());
-			// making search setting are not null and convert shared pointer to shared reference
-			findSessions();
+
 		}
 	}
 	else
@@ -216,13 +213,17 @@ void UCustomGameInstance::createSession()
 
 void UCustomGameInstance::findSessions()
 {
+	// make shareable will make new operator work in unreal
+
+	m_searchSettings = MakeShareable(new FOnlineSessionSearch());
 	if (m_searchSettings.IsValid())
 	{
 		m_searchSettings->bIsLanQuery = false; // through network
 		// allow search presence
-		m_searchSettings->MaxSearchResults = 100; // Allow more search result so that the result 
+		//m_searchSettings->MaxSearchResults = 100; // Allow more search result so that the result 
 		m_searchSettings->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
 		UE_LOG(LogTemp, Warning, TEXT("Start to find sessions"));
+		// make search setting are not null and convert shared pointer to shared reference
 		m_sessionInterface->FindSessions(0, m_searchSettings.ToSharedRef());
 	}
 }
