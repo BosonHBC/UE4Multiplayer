@@ -1,0 +1,28 @@
+"D:\EpicGames\UE_4.24\Engine\Binaries\Win64\UE4Editor.exe" "D:\UnrealProject\MultiplayerPuzzle\MultiplayerPuzzle.uproject" -game -log
+
+Server:
+"D:\EpicGames\UE_4.24\Engine\Binaries\Win64\UE4Editor.exe" "D:\UnrealProject\MultiplayerPuzzle\MultiplayerPuzzle.uproject" /Game/ThirdPersonCPP/Maps/ThirdPersonExampleMap?listen -server -log
+
+Client:
+"D:\EpicGames\UE_4.24\Engine\Binaries\Win64\UE4Editor.exe" "D:\UnrealProject\MultiplayerPuzzle\MultiplayerPuzzle.uproject" 192.168.1.115 -game -log
+
+"D:\EpicGames\UE_4.24\Engine\Binaries\Win64\UE4Editor.exe" "D:\UnrealProject\MultiplayerPuzzle\MultiplayerPuzzle.uproject" 25.11.247.239 -game -log
+
+
+Build Server:
+"D:\UnrealProject\MultiplayerPuzzle\Build\WindowsNoEditor\MultiplayerPuzzle.exe" /Game/ThirdPersonCPP/Maps/ThirdPersonExampleMap?listen -server -log
+
+Build client:
+"D:\UnrealProject\MultiplayerPuzzle\Build\WindowsNoEditor\MultiplayerPuzzle.exe" 25.11.247.239 -game -log
+
+Start lobby
+"D:\EpicGames\UE_4.24\Engine\Binaries\Win64\UE4Editor.exe" "D:\UnrealProject\MultiplayerPuzzle\MultiplayerPuzzle.uproject" /Game/Maps/MainMenu -game -log
+
+MyIPv4:
+192.168.1.115
+
+In Game enable Online log:
+Log LogOnline VeryVerbose
+
+Build client:
+"D:\UnrealProject\MultiplayerPuzzle\Build\WindowsNoEditor\MultiplayerPuzzle.exe" -game -log
