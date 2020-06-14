@@ -112,6 +112,14 @@ void UCustomGameInstance::RefreshSessionMenu()
 	findSessions();
 }
 
+void UCustomGameInstance::StartSession()
+{
+	if (m_sessionInterface.IsValid())
+	{
+		m_sessionInterface->StartSession(SESSION_NAME);
+	}
+}
+
 void UCustomGameInstance::OnSessionCreated(FName sessionName, bool bSucceed)
 {
 	if (!bSucceed)
@@ -228,6 +236,7 @@ void UCustomGameInstance::createSession(const FString& i_sessionName)
 		sessionSetting.NumPublicConnections = 5; // max number of connection
 		sessionSetting.bShouldAdvertise = true; // make it visible to let other to find
 		sessionSetting.bUsesPresence = true;
+		sessionSetting.bAllowJoinInProgress = false;
 		sessionSetting.Set(SESSION_NAME_KEY, i_sessionName, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 
 

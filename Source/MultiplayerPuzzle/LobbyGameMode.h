@@ -22,7 +22,11 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sessions")
 		int PlayersReadyToStartGame = 2;
-
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sessions")
+		float WaitTime = 5.f;
 protected:
 	uint32 m_numOfPlayers = 0;
+	FTimerHandle m_startTimeHandle;
+
+	void travelToGame();
 };

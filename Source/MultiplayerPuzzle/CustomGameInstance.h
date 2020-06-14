@@ -39,6 +39,8 @@ public:
 
 	void RefreshSessionMenu() override;
 
+	void StartSession();
+
 protected:
 	TSubclassOf<UUserWidget> m_mainMenuClass;
 	UMainMenu* m_mainMenuRef;
