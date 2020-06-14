@@ -8,9 +8,10 @@
 #include "Blueprint/UserWidget.h"
 #include "MenuSystem/MainMenu.h"
 #include "OnlineSubsystem.h"
+#include "UObject/NameTypes.h"
 
-
-
+const static FName SESSION_NAME = NAME_GameSession;
+const static FName SESSION_NAME_KEY = TEXT("SessionName");
 
 UCustomGameInstance::UCustomGameInstance()
 {
@@ -49,16 +50,15 @@ void UCustomGameInstance::Host(const FString& i_sessionName)
 {
 	if (m_sessionInterface.IsValid())
 	{
-		m_sessionName = *i_sessionName;
-		if (m_sessionInterface->GetNamedSession(m_sessionName) != nullptr)
+		if (m_sessionInterface->GetNamedSession(SESSION_NAME) != nullptr)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Session %s already exists."), *m_sessionName.ToString());
-			m_sessionInterface->DestroySession(m_sessionName);
-
+			UE_LOG(LogTemp, Warning, TEXT("Session %s already exists."), *SESSION_NAME.ToString());
+			m_sessionInterface->DestroySession(SESSION_NAME);
+			m_recreateSessionName = i_sessionName;
 		}
 		else
 		{
-			createSession();
+			createSession(i_sessionName);
 		}
 	}
 }
@@ -88,7 +88,7 @@ void UCustomGameInstance::Join(uint32 idx)
 		m_mainMenuRef->TearDown();
 	}
 
-	m_sessionInterface->JoinSession(0, m_sessionName, m_searchSettings->SearchResults[idx]);
+	m_sessionInterface->JoinSession(0, SESSION_NAME, m_searchSettings->SearchResults[idx]);
 }
 
 void UCustomGameInstance::GotoMainMenu()
@@ -134,7 +134,7 @@ void UCustomGameInstance::OnSessionCreated(FName sessionName, bool bSucceed)
 	UWorld* world = GetWorld();
 	if (!world) return;
 	// server travel will take all clients together to the new level
-	world->ServerTravel("/Game/Maps/ThirdPersonExampleMap?listen");
+	world->ServerTravel("/Game/Maps/Lobby?listen");
 
 }
 
@@ -147,7 +147,7 @@ void UCustomGameInstance::OnSessionDestroyed(FName sessionName, bool bSucceed)
 	}
 	else
 	{
-		createSession();
+		createSession(m_recreateSessionName);
 	}
 }
 
@@ -167,7 +167,7 @@ void UCustomGameInstance::OnFindSessionComplete(bool bSuccess)
 			UE_LOG(LogTemp, Warning, TEXT("Found session name %s"), *result.GetSessionIdStr());
 			FServerData data;
 			FString nameData;
-			if (result.Session.SessionSettings.Get(FName("SessionName"), nameData))
+			if (result.Session.SessionSettings.Get(SESSION_NAME_KEY, nameData))
 			{
 				data.Name = nameData;
 			}
@@ -211,7 +211,7 @@ void UCustomGameInstance::OnJoinSessionComplete(FName iSessionName, EOnJoinSessi
 	PlayerController->ClientTravel(contactInfo, ETravelType::TRAVEL_Absolute);
 }
 
-void UCustomGameInstance::createSession()
+void UCustomGameInstance::createSession(const FString& i_sessionName)
 {
 	if (m_sessionInterface.IsValid())
 	{
@@ -225,13 +225,13 @@ void UCustomGameInstance::createSession()
 
 		FOnlineSessionSettings sessionSetting;
 		sessionSetting.bIsLANMatch = isLAN;
-		sessionSetting.NumPublicConnections = 2; // max number of connection
+		sessionSetting.NumPublicConnections = 5; // max number of connection
 		sessionSetting.bShouldAdvertise = true; // make it visible to let other to find
 		sessionSetting.bUsesPresence = true;
-		sessionSetting.Set(FName("SessionName"),  m_sessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+		sessionSetting.Set(SESSION_NAME_KEY, i_sessionName, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 
 
-		m_sessionInterface->CreateSession(playerNum, m_sessionName, sessionSetting);
+		m_sessionInterface->CreateSession(playerNum, SESSION_NAME, sessionSetting);
 	}
 }
 

@@ -42,7 +42,6 @@ public:
 protected:
 	TSubclassOf<UUserWidget> m_mainMenuClass;
 	UMainMenu* m_mainMenuRef;
-	FName m_sessionName = "Boson Game";
 
 	IOnlineSessionPtr m_sessionInterface;
 	TSharedPtr<FOnlineSessionSearch> m_searchSettings;
@@ -56,7 +55,8 @@ protected:
 		void OnFindSessionComplete(bool bSuccess);
 
 		void OnJoinSessionComplete(FName iSessionName, EOnJoinSessionCompleteResult::Type iResult);
-	void createSession();
+	void createSession(const FString& i_sessionName);
 
+	FString m_recreateSessionName = "";
 	void findSessions();
 };
