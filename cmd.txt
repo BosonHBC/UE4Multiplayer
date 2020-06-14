@@ -26,3 +26,5 @@ Log LogOnline VeryVerbose
 
 Build client:
 "D:\UnrealProject\MultiplayerPuzzle\Build\WindowsNoEditor\MultiplayerPuzzle.exe" -game -log
+
+"D:\Github\UE4Multiplayer\Build\WindowsNoEditor\MultiplayerPuzzle.exe" -game -log

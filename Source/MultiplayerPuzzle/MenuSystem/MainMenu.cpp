@@ -51,23 +51,25 @@ void UMainMenu::TearDown()
 	PlayerController->bShowMouseCursor = false;
 }
 
-void UMainMenu::SetServerList(const TArray<FString>& i_serverNames)
+void UMainMenu::SetServerList(const TArray<FServerData>& i_serverData)
 {
 	UWorld* world = GetWorld();
 	if (!world) return;
 
 	SessionScroll->ClearChildren();
 	uint32 idx = 0;
-	for (auto& serverName : i_serverNames)
+	for (auto& data : i_serverData)
 	{
 		auto serverRow = CreateWidget<UServerRow>(world, m_serverRowBPClass);
 		if (!serverRow) return;
-		serverRow->ServerName->SetText(FText::FromString(serverName));
+		serverRow->ServerName->SetText(FText::FromString(data.Name));
+		serverRow->HostName->SetText(FText::FromString(data.HostUserName));
+		serverRow->Setdata(data.CurrentPlayers, data.MaxPlayers);
 		serverRow->Setup(this, idx);
 		++idx;
 		SessionScroll->AddChild(serverRow);
 	}
-	if (i_serverNames.Num() > 0)
+	if (i_serverData.Num() > 0)
 	{
 		TextInfo->SetVisibility(ESlateVisibility::Hidden);
 	}
@@ -78,6 +80,24 @@ void UMainMenu::SetServerList(const TArray<FString>& i_serverNames)
 void UMainMenu::SelectIndex(uint32 idx)
 {
 	m_selectedIndex = idx;
+	UpdateScrollRowChildren();
+}
+
+void UMainMenu::UpdateScrollRowChildren()
+{
+	int i = 0;
+	for (auto it : SessionScroll->GetAllChildren())
+	{
+		UServerRow* child = Cast<UServerRow>(it);
+		if (child)
+		{
+			if (i == m_selectedIndex.GetValue())
+				child->OnButtonSelected();
+			else
+				child->OnButtonDeSelected();
+		}
+		++i;
+	}
 }
 
 void UMainMenu::ToggleEnterButton(bool i_enable)
@@ -95,22 +115,30 @@ bool UMainMenu::Initialize()
 	HostButton->OnClicked.AddDynamic(this, &UMainMenu::OnHostClicked);
 	JoinButton->OnClicked.AddDynamic(this, &UMainMenu::OnJoinClicked);
 
+	HostComfirmButton->OnClicked.AddDynamic(this, &UMainMenu::OnHostComfirmButtonClicked);
+
 	EnterButton_1->OnClicked.AddDynamic(this, &UMainMenu::OnEnterClicked);
 	BackButton_1->OnClicked.AddDynamic(this, &UMainMenu::OnBackClick);
+	HostBackButton->OnClicked.AddDynamic(this, &UMainMenu::OnBackClick);
 
-	AddressInput->OnTextChanged.AddDynamic(this, &UMainMenu::OnTextChanged);
+	SessionNameTextBox->OnTextChanged.AddDynamic(this, &UMainMenu::OnTextChanged);
 
 	return true;
 }
 
 void UMainMenu::OnHostClicked()
 {
+	// go to host menu
+	Switcher->SetActiveWidgetIndex(2);
+}
+
+void UMainMenu::OnHostComfirmButtonClicked()
+{
 	// Host server
 	if (MenuInterface)
 	{
-		MenuInterface->Host();
+		MenuInterface->Host(m_hostSessionName);
 	}
-
 }
 
 void UMainMenu::OnJoinClicked()
@@ -144,5 +172,6 @@ void UMainMenu::OnBackClick()
 
 void UMainMenu::OnTextChanged(const FText& text)
 {
-	m_IPAddress = text.ToString();
+	m_hostSessionName = text.ToString();
 }
+

@@ -4,6 +4,12 @@
 #include "ServerRow.h"
 #include "MainMenu.h"
 #include "Components/Button.h"
+#include "Components/TextBlock.h"
+
+void UServerRow::Setdata(uint16 currentPlayer, uint16 maxPlayer)
+{
+	PlayerCount->SetText(FText::FromString(FString::Printf(TEXT("%d / %d"), currentPlayer, maxPlayer)));
+}
 
 void UServerRow::Setup(UMainMenu* parent, uint32 idx)
 {
@@ -19,5 +25,4 @@ void UServerRow::OnServerRowButtonClick()
 		m_parent->SelectIndex(m_idx);
 		m_parent->ToggleEnterButton(true);
 	}
-
 }

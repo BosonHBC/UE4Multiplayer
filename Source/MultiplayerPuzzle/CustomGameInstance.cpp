@@ -45,10 +45,11 @@ void UCustomGameInstance::Init()
 	}
 }
 
-void UCustomGameInstance::Host()
+void UCustomGameInstance::Host(const FString& i_sessionName)
 {
 	if (m_sessionInterface.IsValid())
 	{
+		m_sessionName = *i_sessionName;
 		if (m_sessionInterface->GetNamedSession(m_sessionName) != nullptr)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Session %s already exists."), *m_sessionName.ToString());
@@ -160,13 +161,27 @@ void UCustomGameInstance::OnFindSessionComplete(bool bSuccess)
 	}
 	if (m_sessionInterface.IsValid() && m_mainMenuRef)
 	{
-		TArray<FString> serverNames;
+		TArray<FServerData> serverData;
 		for (FOnlineSessionSearchResult& result : m_searchSettings->SearchResults)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Found session name %s"), *result.GetSessionIdStr());
-			serverNames.Add(result.GetSessionIdStr());
+			FServerData data;
+			FString nameData;
+			if (result.Session.SessionSettings.Get(FName("SessionName"), nameData))
+			{
+				data.Name = nameData;
+			}
+			else
+				data.Name = result.GetSessionIdStr();
+
+			data.MaxPlayers = result.Session.SessionSettings.NumPublicConnections;
+			data.CurrentPlayers = data.MaxPlayers - result.Session.NumOpenPublicConnections;
+
+			data.HostUserName = result.Session.OwningUserName;
+
+			serverData.Add(data);
 		}
-		m_mainMenuRef->SetServerList(serverNames);
+		m_mainMenuRef->SetServerList(serverData);
 	}
 
 }
@@ -201,12 +216,21 @@ void UCustomGameInstance::createSession()
 	if (m_sessionInterface.IsValid())
 	{
 		int32 playerNum = 0;
+		bool isLAN = false; // through steam
+		FName onlineSubName = IOnlineSubsystem::Get()->GetSubsystemName();
+		if (onlineSubName.IsEqual(FName("NULL")))
+		{
+			isLAN = true; // local network
+		}
+
 		FOnlineSessionSettings sessionSetting;
-		//sessionSetting.bIsLANMatch = true; // local network
-		sessionSetting.bIsLANMatch = false; // through internet
+		sessionSetting.bIsLANMatch = isLAN;
 		sessionSetting.NumPublicConnections = 2; // max number of connection
 		sessionSetting.bShouldAdvertise = true; // make it visible to let other to find
 		sessionSetting.bUsesPresence = true;
+		sessionSetting.Set(FName("SessionName"),  m_sessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+
+
 		m_sessionInterface->CreateSession(playerNum, m_sessionName, sessionSetting);
 	}
 }
@@ -220,7 +244,7 @@ void UCustomGameInstance::findSessions()
 	{
 		m_searchSettings->bIsLanQuery = false; // through network
 		// allow search presence
-		//m_searchSettings->MaxSearchResults = 100; // Allow more search result so that the result 
+		m_searchSettings->MaxSearchResults = 100; // Allow more search result so that the result 
 		m_searchSettings->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
 		UE_LOG(LogTemp, Warning, TEXT("Start to find sessions"));
 		// make search setting are not null and convert shared pointer to shared reference

@@ -24,7 +24,7 @@ public:
 	void Init() override;
 
 	UFUNCTION(Exec)
-		void Host() override;
+		void Host(const FString& i_sessionName) override;
 
 	UFUNCTION(Exec)
 		void Join(const FString& address) override;
